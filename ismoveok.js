@@ -1,4 +1,4 @@
 console.log("#ismoveok.js");
-var isMoveOK = functioin(){
+var isMoveOK = function(){
 	
 };
