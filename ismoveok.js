@@ -26,7 +26,6 @@ var verIndex = [[0, 6], [0, 7], [0, 8], [0, 9], [0, 10],
 var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
 	[2, 0], [3, 0], [4, 0], [5, 0]];
 
-console.log("#ismoveok.js");
 /*jslvar devel: true, indent: 2 */
 /*global console */
 var isMoveOk = (function () {
@@ -34,9 +33,6 @@ var isMoveOk = (function () {
 	'use strict';
 
 	function isEqual(object1, object2) {
-		console.log(JSON.stringify(object1));
-		console.log(JSON.stringify(object2));
-		
 		return JSON.stringify(object1) === JSON.stringify(object2);
 	}
 
@@ -59,7 +55,6 @@ var isMoveOk = (function () {
 						cnt = 1;
 					}
 					if( cnt === N ){
-						console.log('hor');
 						return board[i][j];
 					}
 				}
@@ -78,10 +73,8 @@ var isMoveOk = (function () {
 						cnt = 1;
 					}
 					if( cnt === N ){
-						console.log('ver');
 						return board[i][j];
 					}
-
 				}
 			}
 		}
@@ -98,15 +91,11 @@ var isMoveOk = (function () {
 						cnt = 1;
 					}
 					if(cnt === N){
-					
-						console.log('til');
 						return board[row][col];
 					}
 				}
 			}
-
 		}
-		
 		return '';
 	}//Done
 
@@ -120,7 +109,6 @@ var isMoveOk = (function () {
 				}
 			}
 		}
-		console.log('tie');
 		return true;
 	}//Done
 
@@ -128,15 +116,18 @@ var isMoveOk = (function () {
 	 * Returns the move that should be performed when player 
 	 * with index turnIndexBeforeMove makes a move in cell row X col. 
 	 */
-	function createMove(board, row, col, turnIndexBeforeMove) {
+	function createMove(board, row, col, delDirRow, delDirCol, delDis, turnIndexBeforeMove) {
 		var boardAfterMove = copyObject(board);
 		// first one should be Red
 		boardAfterMove[row][col] = turnIndexBeforeMove === 0 ? 'R' : 'Y';
+		//remove one of the opponent's pawn
+		if(delDis !== 0) {
+			boardAfterMove[row+delDirRow*delDis][col+delDirRow*delDis] = '';
+		}
 		var winner = getWinner(boardAfterMove);
 		var firstOperation;
 		if (winner !== '' || isTie(board)) {
 			// Game over.
-			console.log('winner' + winner);
 			firstOperation = {endMatch: {endMatchScores: 
 				(winner === 'R' ? [1, 0] : (winner === 'Y' ? [0, 1] : [0, 0]))}};
 		} else {
@@ -145,7 +136,7 @@ var isMoveOk = (function () {
 		}
 		return [firstOperation,
 			   {set: {key: 'board', value: boardAfterMove}},
-			   {set: {key: 'delta', value: {row: row, col: col}}}];
+			   {set: {key: 'delta', value: {row: row, col: col, delDirRow: delDirRow, delDirCol: delDirCol, delDis: delDis}}}];
 	}//done
 
 	function isMoveOk(params) {
@@ -153,12 +144,6 @@ var isMoveOk = (function () {
 		var turnIndexBeforeMove = params.turnIndexBeforeMove; 
 		var stateBeforeMove = params.stateBeforeMove; 
 		var i, j;
-		// The state and turn after move are not needed in TicTacToe (or in any game where all state is public).
-		//var turnIndexAfterMove = params.turnIndexAfterMove; 
-		//var stateAfterMove = params.stateAfterMove; 
-
-		// We can assume that turnIndexBeforeMove and stateBeforeMove are legal, and we need
-		// to verify that move is legal.
 		try {
 			// Example move:
 			// [{setTurn: {turnIndex : 1},
@@ -167,7 +152,17 @@ var isMoveOk = (function () {
 			var deltaValue = move[2].set.value;
 			var row = deltaValue.row;
 			var col = deltaValue.col;
+			var delDirRow = deltaValue.delDirRow;
+			var delDirCol = deltaValue.delDirCol;
+			var delDis = deltaValue.delDis;
 			var board = stateBeforeMove.board;
+			var rowBeforeMove = stateBeforeMove.row;
+			var colBeforeMove = stateBeforeMove.col;
+			var delDisBeforeMove = stateBeforeMove.delDis;
+			var delDirRowBeforeMove = stateBeforeMove.delDirRow;
+			var delDirColBeforeMove = stateBeforeMove.delDirCol;
+			var delRow = rowBeforeMove + delDisBeforeMove*delDirRowBeforeMove;
+			var delCol = colBeforeMove + delDisBeforeMove*delDirColBeforeMove;
 			if (board === undefined) {
 				// Initially (at the beginning of the match), stateBeforeMove is {}. 
 				board = new Array(11);
@@ -180,17 +175,37 @@ var isMoveOk = (function () {
 			}
 			// One can only make a move in an empty position 
 			if (board[row][col] !== '') {
-				console.log(board[row][col]);
 				return false;
 			}
-			var expectedMove = createMove(board, row, col, turnIndexBeforeMove);
+			// One can't place at a position that wasn't taken at last move.
+			if(delDisBeforeMove !== 0 && delRow === row && delCol === Col) {
+				return false;
+			}
+			// Only when the opponents pawn is trapped can be removed.
+			if(delDis !== 0){
+				if(delDis > 2 || delDis < 0){
+					return false;
+				}
+				if(row+3*delDirRow < 0 || col+3*delDirCol < 0){
+					return false;
+				}
+				if(board[row+delDirRow][col+delDirCol] !== (turnIndexBeforeMove===0?'Y':'R') ){
+					return false;
+				}
+				if(board[row+2*delDirRow][col+2*delDirCol] !== (turnIndexBeforeMove===0?'Y':'R') ){
+					return false;
+				}
+				if(board[row+3*delDirRow][col+3*delDirCol] !== (turnIndexBeforeMove===0?'R':'Y') ){
+					return false;
+				}
+
+			}
+			var expectedMove = createMove(board, row, col, delDirRow, delDirCol, delDis, turnIndexBeforeMove);
 			if (!isEqual(move, expectedMove)) {
-				console.log(2);
 				return false;
 			}
 		} catch (e) {
 			// if there are any exceptions then the move is illegal
-			console.log(e+3);
 			return false;
 		}
 		return true;
@@ -212,13 +227,13 @@ var isMoveOk = (function () {
 				isMoveOk({turnIndexBeforeMove: 0, stateBeforeMove: {}, 
 					move: [{setTurn: {turnIndex : 1}},
 				{set: {key: 'board', value: board}},
-				{set: {key: 'delta', value: {row: 0, col: 0}}}]}),
+				{set: {key: 'delta', value: {row: 0, col: 0, delDirRow:0, delDirCol:0, delDis:0}}}]}),
 				// Check placing O in 0x1 from previous state.   
 				isMoveOk({turnIndexBeforeMove: 1, 
-					stateBeforeMove: {board: board, delta: {row: 0, col: 0}}, 
+					stateBeforeMove: {board: board, delta: {row: 0, col: 0, delDirRow:0, delDirCol:0, delDis:0}}, 
 				move: [{setTurn: {turnIndex : 0}},
 				{set: {key: 'board', value: board2}},
-				{set: {key: 'delta', value: {row: 0, col: 1}}}]}),
+				{set: {key: 'delta', value: {row: 0, col: 1, delDirRow:0, delDirCol:0, delDis:0}}}]}),
 				// Checking an illegal move.
 				isMoveOk({turnIndexBeforeMove: 0, stateBeforeMove: {}, move: [{setTurn: {turnIndex : 0}}]})
 				]);
