@@ -10,7 +10,7 @@ angular.module('myApp',
     console.log("what are you?");
 
     hexagon.HexagonGrid("HexCanvas", 50);
-    hexagon.drawHexGrid(11, 11, 30, 30, true);
+    hexagon.drawHexGrid(gameLogic.horIndex, 30, 30, true);
     var isLocalTesting = $window.parent === $window;
 
     function updateUI(params) {

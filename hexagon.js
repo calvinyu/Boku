@@ -19,7 +19,7 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
         
     };
 
-    this.drawHexGrid = function (rows, cols, originX, originY, isDebug) {
+    this.drawHexGrid = function (hor, originX, originY, isDebug) {
         hex.canvasOriginX = originX;
         hex.canvasOriginY = originY;
         
@@ -29,9 +29,11 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
 
         var offsetColumn = false;
 
-        for (var col = 0; col < cols; col++) {
-            for (var row = 0; row < rows; row++) {
-
+        for (var col = 0; col < 12; col++) {
+            for (var row = 0; row < 12; row++) {
+                var x = parseInt((5-col+2*row)/2, 10);
+                if(5-col+2*row<0) x = 1000;
+                var y = x + col - 5;
                 if (!offsetColumn) {
                     currentHexX = (col * hex.side) + originX;
                     currentHexY = (row * hex.height) + originY;
@@ -43,8 +45,8 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
                 if (isDebug) {
                     debugText = col + "," + row;
                 }
-
-                hex.drawHex(currentHexX, currentHexY, "#ddd", debugText);
+                console.log(x,y);
+                if(x>=0 && x<11 && hor[x][0]<=y &&  y<hor[x][1]) hex.drawHex(currentHexX, currentHexY, "#ddd", debugText);
             }
             offsetColumn = !offsetColumn;
         }

@@ -16,6 +16,23 @@ angular.module('myApp.gameLogic', []).service('gameLogic', function(){
  *  10           x x x x x  
  */
 
+/* Grid representation:
+ *
+ *     0 1 2 3 4 5 6 7 8 9
+ *   0       x x x 
+ *   1   x x x x x x x
+ *   2 x x x x x x x x x
+ *   3 x x x x x x x x x
+ *   4 x x x x x x x x x
+ *   5 x x x x x x x x x  
+ *   6 x x x x x x x x x 
+ *   7     x x x x x     
+ *   8         x         
+ *   9                  
+ *  10                    
+ */
+
+
 //the number of consecutive pawns to win
 var N = 5;
 //the boundary of horizontal direction
@@ -99,6 +116,9 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
 		}
 		return '';
 	}//Done
+  function isInsideBoard(row,col) {
+    return (row>=0 && row<=10) && (horIndex[row][0] <= col) && (col < howIndex[row][1]);
+  }
 
 	/** Returns true if the game ended in a tie because there are no empty cells. */
 	function isTie(board) {
@@ -313,4 +333,5 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
 		this.setBoard = setBoard;
 		this.getRiddles = getRiddles;
     this.createMove = createMove;
+    this.board = setBoard();
 });
