@@ -312,4 +312,5 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
 		this.getExampleGame = getExampleGame;
 		this.setBoard = setBoard;
 		this.getRiddles = getRiddles;
+    this.createMove = createMove;
 });
