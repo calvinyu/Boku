@@ -1,9 +1,8 @@
 'use strict';
 
-angular.module('myApp.hexagon',[]).service('hexagon', function () {
+angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
     // Hex math defined here: http://blog.ruslans.com/2011/02/hexagonal-grid-math.html
     var hex = this;
-    console.log("what's going on?");
     this.HexagonGrid = function(canvasId, radius) {
         hex.radius = radius;
 
@@ -43,7 +42,7 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
                 }
 
                 if (isDebug) {
-                    debugText = col + "," + row;
+                    debugText = currentHexY;
                 }
                 console.log(x,y);
                 if(x>=0 && x<11 && hor[x][0]<=y &&  y<hor[x][1]) hex.drawHex(currentHexX, currentHexY, "#ddd", debugText);
@@ -86,16 +85,18 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
 
     //Recusivly step up to the body to calculate canvas offset.
     this.getRelativeCanvasOffset = function() {
+        //return {x:hex.canvas.getBoundingClientRect().left, y:hex.canvas.getBoundingClientRect().top};
         var x = 0, y = 0;
         var layoutElement = hex.canvas;
-        if (layoutElement.offsetParent) {
-            do {
-                x += layoutElement.offsetLeft;
-                y += layoutElement.offsetTop;
-            } while (layoutElement = layoutElement.offsetParent);
-            
-            return { x: x, y: y };
+        while (layoutElement.offsetParent) {
+            x += layoutElement.offsetLeft;
+            y += layoutElement.offsetTop;
+            layoutElement = layoutElement.offsetParent;    
         }
+        hex.offSetX = x;
+        hex.offSetY = y;
+        return { x: x, y: y };
+        
     }
 
     //Uses a grid overlay algorithm to determine hexagon location
@@ -103,9 +104,18 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
     this.getSelectedTile = function(mouseX, mouseY) {
 
         var offSet = hex.getRelativeCanvasOffset();
+        console.log("mouse: ", mouseX, mouseY);
 
-        mouseX -= offSet.x;
+        mouseX -= offSet.x;       
         mouseY -= offSet.y;
+
+        mouseX /= hex.scale ;
+        mouseY /= hex.scale ;
+
+        mouseX -= hex.tx;
+        mouseY -= hex.ty;
+        mouseX -= hex.canvasOriginX;
+        mouseY -= hex.canvasOriginY;
 
         var column = Math.floor((mouseX) / hex.side);
         var row = Math.floor(
@@ -190,10 +200,7 @@ angular.module('myApp.hexagon',[]).service('hexagon', function () {
         var mouseX = e.pageX;
         var mouseY = e.pageY;
 
-        var localX = mouseX - hex.canvasOriginX;
-        var localY = mouseY - hex.canvasOriginY;
-
-        var tile = hex.getSelectedTile(localX, localY);
+        var tile = hex.getSelectedTile(mouseX, mouseY);
         //reversed for display reason;
         hex.column = tile.column;
         hex.row = tile.row;

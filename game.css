@@ -5,6 +5,10 @@ body {
   margin: 0px;
   padding: 0px;
 }
+div {
+  margin: 0px;
+  padding: 0px;
+}
 .cell {
   text-align:center;
   vertical-align: middle;

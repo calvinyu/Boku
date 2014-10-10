@@ -8,7 +8,8 @@ angular.module('myApp',
       $window, $scope, $log,
       messageService, scaleBodyService, stateService, gameLogic, hexagon) {
     console.log("what are you?");
-
+    this.scale = scaleBodyService.scale;
+    var ctrl = this;
     hexagon.HexagonGrid("HexCanvas", 50);
     hexagon.drawHexGrid(gameLogic.horIndex, 30, 30, false);
     var isLocalTesting = $window.parent === $window;
@@ -21,8 +22,7 @@ angular.module('myApp',
       $scope.isYourTurn = params.turnIndexAfterMove >= 0 && // game is ongoing
         params.yourPlayerIndex === params.turnIndexAfterMove; // it's my turn
       $scope.turnIndex = params.turnIndexAfterMove;
-      console.log("test");
-      hexagon.updateUI($scope.turnIndex);
+      hexagon.updateUI(1 - params.turnIndexBeforeMove);
     }
 
     function sendMakeMove(move) {
@@ -44,12 +44,18 @@ angular.module('myApp',
       riddles: gameLogic.getRiddles()
     };
     $scope.cellClicked = function (e) {
-      console.log('start drawing');
+      hexagon.tx = scaleBodyService.tx;
+      hexagon.ty = scaleBodyService.ty;
+      hexagon.scale = scaleBodyService.scale;
       hexagon.getIndex(e);
-      console.log("done drawing");
-      
+      ctrl.offX = hexagon.offSetX;
+      ctrl.offY = hexagon.offSetY;
       var row = parseInt((5-hexagon.column+2*hexagon.row)/2, 10);
       var col = row + hexagon.column - 5;
+      ctrl.x = e.pageX;
+      ctrl.y = e.pageY;
+      ctrl.row = row;
+      ctrl.column = col;
       $log.info(["Clicked on cell:", row, col]);
       if (!$scope.isYourTurn) {
         return;
@@ -66,7 +72,7 @@ angular.module('myApp',
       }
     };
 
-    //scaleBodyService.scaleBody({width: 152, height: 152});
+    scaleBodyService.scaleBody({width: 1000, height: 1100});
 
     if (isLocalTesting) {
       game.isMoveOk = gameLogic.isMoveOk;

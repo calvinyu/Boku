@@ -6,8 +6,9 @@ angular.module('myApp.scaleBodyService', [])
     var body = doc.body;
     var gameSize = null;
     var oldSizes = null;
-
-    function scaleBody(_gameSize) {
+    var scaleService = this;
+    function scaleBody(_gameSize)
+     {
       gameSize = _gameSize;
       rescale();
     }
@@ -39,8 +40,11 @@ angular.module('myApp.scaleBodyService', [])
       var scaleX = windowWidth / myGameWidth;
       var scaleY = windowHeight / myGameHeight;
       var scale = Math.min(scaleX, scaleY);
+      scaleService.scale = scale;
       var tx = (windowWidth / scale - myGameWidth) / 2;
       var ty = (windowHeight / scale - myGameHeight) / 2;
+      scaleService.tx = tx;
+      scaleService.ty = ty;
       var transformString = "scale(" + scale + "," + scale + ")  translate(" + tx + "px, " + ty + "px)";
       body.style['transform'] = transformString;
       body.style['-o-transform'] = transformString;
