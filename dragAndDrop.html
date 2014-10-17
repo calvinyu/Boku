@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Drag-n-drop</title>
+  <meta name="description" content="Drag-n-drop example">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular-touch.js"></script>
+  <script>
+  angular.module('myApp', ['ngTouch'])
+    .controller('Ctrl', function ($scope, $log, scaleBodyService) {
+
+      scaleBodyService.scaleBody({width: 300, height: 300});
+
+      $scope.board = [['X','O'],['','']];
+      $scope.row = 0;
+      $scope.col = 0;
+      $scope.notifications = "Nothing was dragged";
+      $scope.allowDrop = function (ev) {
+        ev.preventDefault();
+      };
+      $scope.drag = function (ev) {
+        $scope.$apply(function() {
+          var row = parseInt(ev.target.getAttribute("data-row"));
+          var col = parseInt(ev.target.getAttribute("data-col"));
+          var data = $scope.board[col][row];
+          $scope.notifications = "Started dragging pieceId=" + data;
+          ev.dataTransfer.setData("text/plain", data);
+          $scope.row = row;
+          $scope.col = col;
+          //ev.dataTransfer.setData("text/plain", data);
+        });
+      };
+      $scope.drop = function (ev) {
+        $scope.$apply(function() {
+          ev.preventDefault();
+          var data = ev.dataTransfer.getData("text/plain");
+          var row = ev.target.getAttribute("data-row");
+          var col = ev.target.getAttribute("data-col");
+          if(data==='O') $scope.notifications = "Black ";
+          else if (data === 'X') $scope.notifications = "White ";
+          $scope.notifications += "piece dropped in cell " + row + "X" + col +".";
+          $scope.board[$scope.col][$scope.row] = '';
+          $scope.board[col][row] = data;
+          alert($scope.notifications);
+        });
+      }
+    });
+  </script>
+  <script src="http://yoav-zibin.github.io/emulator/scaleBodyService.js"></script>
+</head>
+<body ng-controller="Ctrl">
+  <table border="1">
+    <tr ng-repeat="row in board track by $index">
+      <td align="center" valign="middle" width="120px" height="120px" ng-repeat="cell in row track by $index">
+        <div draggable="true" ondragstart="angular.element(this).scope().drag(event)"
+        ondrop="angular.element(this).scope().drop(event)"
+             ondragover="angular.element(this).scope().allowDrop(event)"
+            data-row="{{$parent.$index}}" data-col="{{$index}}" 
+            ng-class="{}">
+            <img data-row="{{$parent.$index}}" data-col="{{$index}}" height="80px" width="80px" src="img/black.jpeg" ng-show="board[$index][$parent.$index]=='O'">
+            <img data-row="{{$parent.$index}}" data-col="{{$index}}" "{{$parent.$index}}" data-col="{{$index}}" height="80px" width="80px" src="img/white.jpeg" ng-show="board[$index][$parent.$index]=='X'">
+          <br>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

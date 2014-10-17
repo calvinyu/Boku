@@ -15,7 +15,10 @@ angular.module('myApp',
     var isLocalTesting = $window.parent === $window;
     var moveAudio = new Audio('audio/small_gun.mp3');
     moveAudio.load();
-
+    //drag and drop
+    $scope.list1 = {title: 'AngularJS - Drag Me'};
+    $scope.list2 = {};
+    
     //set mode
     this.setMode = function(mode){
       stateService.setPlayMode(mode);
