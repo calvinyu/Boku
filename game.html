@@ -21,7 +21,11 @@
 </head>
 <body ng-controller="Ctrl as ctrl">
   <div>
+
   <!-- Draw hexagon here -->
+  <!--div ng-repeat="row in board track by $index">
+      <canvas ng-repeat="cell in row track by $index" id="HexCanvas{{$parent.$index}}-{{$index}}" width="1000" height="1100" ng-click="cellClicked($event);" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+  </div-->
   <canvas id="HexCanvas" width="1000" height="1100" ng-click="cellClicked($event);"></canvas>
 </div>
 </body>

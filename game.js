@@ -23,8 +23,6 @@ angular.module('myApp',
     //stateService.setPlayMode("playAgainstTheComputer");
     this.setMode("playAgainstTheComputer");
     function updateUI(params) {
-      console.log("updating UI");
-      hexagon.turn = params.yourPlayerIndex;
       $scope.board = params.stateAfterMove.board;
       $scope.delta = params.stateAfterMove.delta;
       if ($scope.board === undefined) {
@@ -59,8 +57,8 @@ angular.module('myApp',
       var move = gameLogic.createComputerMove($scope.board, $scope.turnIndex);
       stateService.makeMove(move);
 
-      hexagon.row = parseInt((5-move[2].set.value.col+2*move[2].set.value.row)/2, 10);
-      var y = hexagon.row + move[2].set.value.col - 5;
+      hexagon.column = move[2].set.value.col - move[2].set.value.row + 5;
+      hexagon.row = parseInt((-4+hexagon.column+2*move[2].set.value.row)/2, 10);
 
 
     }
@@ -107,7 +105,6 @@ angular.module('myApp',
         $log.info(["Cell is already full in position:", row, col, e.message]);
         return;
       }
-      //hexagon.updateUI();
     };
 
     scaleBodyService.scaleBody({width: 1000, height: 1100});

@@ -5,7 +5,7 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
     var hex = this;
     this.HexagonGrid = function(canvasId, radius) {
         hex.radius = radius;
-
+        console.log(canvasId);
         hex.height = Math.sqrt(3) * radius;
         hex.width = 2 * radius;
         hex.side = (3 / 2) * radius;
@@ -44,18 +44,42 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
                     debugText = currentHexY;
                 }
                 if(x>=0 && x<11){
-                    if(board[x][y] == 'R')
-                        hex.drawHex(currentHexX, currentHexY, "#e00", debugText);
+                    if((board[x][y] =='R' || board[x][y] =='Y' || board[x][y]=='' )&& row==hex.row && col==hex.column)
+                        animateMove(currentHexX, currentHexY, (new Date()).getTime(), board[x][y]);
+                        //hex.drawHex(currentHexX, currentHexY, "#888", debugText);
+                    else if(board[x][y] == 'R')
+                        hex.drawHex(currentHexX, currentHexY, "#f00", debugText);
                     else if (board[x][y] == 'Y')
-                        hex.drawHex(currentHexX, currentHexY, "#0ee", debugText);
+                        hex.drawHex(currentHexX, currentHexY, "#ff0", debugText);
                     else if( board[x][y] == '')
-                        hex.drawHex(currentHexX, currentHexY, "#ddd", debugText);
+                        hex.drawHex(currentHexX, currentHexY, "#209A59", debugText);
                 }
             }
             offsetColumn = !offsetColumn;
         }
     };
-
+        window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+      })();
+    function animateMove(x,y, startTime, turn){
+        var time = (new Date()).getTime();
+        var timeDiff = time - startTime;
+        if(timeDiff > 500) return;
+        var color;
+        //console.log(turn);
+        if(turn == 'R')
+            color = "rgb(" + parseInt(timeDiff*255/500, 10) + ",0,0)";
+        else if( turn == 'Y')
+            color = "rgb(" + parseInt(timeDiff*255/500, 10) + ","+parseInt(timeDiff*255/500, 10)+",0)";
+        //console.log(color);
+        hex.drawHex(x, y, color, false);
+        requestAnimFrame(function() {
+          animateMove(x,y,startTime,turn);
+        });
+    }
     this.drawHexAtColRow = function(column, row, color) {
         var drawy = column % 2 == 0 ? (row * hex.height) + hex.canvasOriginY : (row * hex.height) + hex.canvasOriginY + (hex.height / 2);
         var drawx = (column * hex.side) + hex.canvasOriginX;
@@ -204,7 +228,6 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
         var mouseY = y;
 
         var tile = hex.getSelectedTile(mouseX, mouseY);
-        //reversed for display reason;
         hex.column = tile.column;
         hex.row = tile.row;
     };
