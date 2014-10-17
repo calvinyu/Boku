@@ -18,7 +18,7 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
         
     };
 
-    this.drawHexGrid = function (hor, originX, originY, isDebug) {
+    this.drawHexGrid = function (hor, originX, originY, isDebug, board) {
         hex.canvasOriginX = originX;
         hex.canvasOriginY = originY;
         
@@ -40,12 +40,17 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
                     currentHexX = col * hex.side + originX;
                     currentHexY = (row * hex.height) + originY + (hex.height * 0.5);
                 }
-
                 if (isDebug) {
                     debugText = currentHexY;
                 }
-                console.log(x,y);
-                if(x>=0 && x<11 && hor[x][0]<=y &&  y<hor[x][1]) hex.drawHex(currentHexX, currentHexY, "#ddd", debugText);
+                if(x>=0 && x<11){
+                    if(board[x][y] == 'R')
+                        hex.drawHex(currentHexX, currentHexY, "#e00", debugText);
+                    else if (board[x][y] == 'Y')
+                        hex.drawHex(currentHexX, currentHexY, "#0ee", debugText);
+                    else if( board[x][y] == '')
+                        hex.drawHex(currentHexX, currentHexY, "#ddd", debugText);
+                }
             }
             offsetColumn = !offsetColumn;
         }
@@ -54,7 +59,6 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
     this.drawHexAtColRow = function(column, row, color) {
         var drawy = column % 2 == 0 ? (row * hex.height) + hex.canvasOriginY : (row * hex.height) + hex.canvasOriginY + (hex.height / 2);
         var drawx = (column * hex.side) + hex.canvasOriginX;
-
         hex.drawHex(drawx, drawy, color, "");
     };
 
@@ -180,7 +184,6 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
         return  { row: row, column: column };
     };
 
-
     this.sign = function(p1, p2, p3) {
         return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
     };
@@ -196,21 +199,21 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
         return ((b1 == b2) && (b2 == b3));
     };
 
-    this.getIndex = function (e) {
-        var mouseX = e.pageX;
-        var mouseY = e.pageY;
+    this.getIndex = function (x,y) {
+        var mouseX = x;
+        var mouseY = y;
 
         var tile = hex.getSelectedTile(mouseX, mouseY);
         //reversed for display reason;
         hex.column = tile.column;
         hex.row = tile.row;
     };
-    this.updateUI = function(turn){
+    this.updateUI = function(){
         if (hex.column >= 0 && hex.row >= 0) {
             var drawy = hex.column % 2 == 0 ? (hex.row * hex.height) 
             + hex.canvasOriginY + 6 : (hex.row * hex.height) + hex.canvasOriginY + 6 + (hex.height / 2);
             var drawx = (hex.column * hex.side) + hex.canvasOriginX;
-            if(turn === 1)
+            if(hex.turn === 1)
                 hex.drawHex(drawx, drawy - 6, "rgba(255,0,0,0.4)", "");
             else
                 hex.drawHex(drawx, drawy - 6, "rgba(255,255,0,0.4)", "");

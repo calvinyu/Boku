@@ -5,24 +5,46 @@ angular.module('myApp',
     ['myApp.messageService', 'myApp.gameLogic', 'myApp.scaleBodyService',
      'platformApp', 'myApp.hexagon'])
   .controller('Ctrl', function (
-      $window, $scope, $log,
+      $window, $scope, $log,$timeout,
       messageService, scaleBodyService, stateService, gameLogic, hexagon) {
-    console.log("what are you?");
-    this.scale = scaleBodyService.scale;
+    //setting up canvas
     var ctrl = this;
+    $scope.board = gameLogic.setBoard();
     hexagon.HexagonGrid("HexCanvas", 50);
-    hexagon.drawHexGrid(gameLogic.horIndex, 30, 30, false);
+    //hexagon.drawHexGrid(gameLogic.horIndex, 30, 30, false, $scope.board);
     var isLocalTesting = $window.parent === $window;
+    var moveAudio = new Audio('audio/small_gun.mp3');
+    moveAudio.load();
 
+    //set mode
+    this.setMode = function(mode){
+      stateService.setPlayMode(mode);
+    }
+    //stateService.setPlayMode("playAgainstTheComputer");
+    this.setMode("playAgainstTheComputer");
     function updateUI(params) {
+      console.log("updating UI");
+      hexagon.turn = params.yourPlayerIndex;
       $scope.board = params.stateAfterMove.board;
+      $scope.delta = params.stateAfterMove.delta;
       if ($scope.board === undefined) {
         $scope.board = gameLogic.setBoard();
       }
+      else{
+        moveAudio.play();  
+      }
+      hexagon.drawHexGrid(gameLogic.horIndex, 30, 30, false, $scope.board);
+      
       $scope.isYourTurn = params.turnIndexAfterMove >= 0 && // game is ongoing
         params.yourPlayerIndex === params.turnIndexAfterMove; // it's my turn
       $scope.turnIndex = params.turnIndexAfterMove;
-      hexagon.updateUI(1 - params.turnIndexBeforeMove);
+      // Is it the computer's turn?
+      hexagon.turn = params.yourPlayerIndex;
+      if ($scope.isYourTurn
+          && params.playersInfo[params.yourPlayerIndex].playerId === '') {
+        // Wait 500 milliseconds until animation ends.
+        $timeout(sendComputerMove, 500);
+      }
     }
 
     function sendMakeMove(move) {
@@ -33,7 +55,15 @@ angular.module('myApp',
         messageService.sendMessage({makeMove: move});
       }
     }
+    function sendComputerMove() {
+      var move = gameLogic.createComputerMove($scope.board, $scope.turnIndex);
+      stateService.makeMove(move);
 
+      hexagon.row = parseInt((5-move[2].set.value.col+2*move[2].set.value.row)/2, 10);
+      var y = hexagon.row + move[2].set.value.col - 5;
+
+
+    }
     // Before getting any updateUI message, we show an empty board to a viewer (so you can't perform moves).
     updateUI({stateAfterMove: {}, turnIndexAfterMove: 0, yourPlayerIndex: -2});
     var game = {
@@ -44,22 +74,29 @@ angular.module('myApp',
       riddles: gameLogic.getRiddles()
     };
     $scope.cellClicked = function (e) {
+      var position = getRowCol(e.pageX, e.pageY);
+      tryMakeMove(position.x, position.y);
+    }
+    function getRowCol(x,y) {
       hexagon.tx = scaleBodyService.tx;
       hexagon.ty = scaleBodyService.ty;
       hexagon.scale = scaleBodyService.scale;
-      hexagon.getIndex(e);
+      hexagon.getIndex(x,y);
       ctrl.offX = hexagon.offSetX;
       ctrl.offY = hexagon.offSetY;
       var row = parseInt((5-hexagon.column+2*hexagon.row)/2, 10);
       var col = row + hexagon.column - 5;
-      ctrl.x = e.pageX;
-      ctrl.y = e.pageY;
+      ctrl.x = x;
+      ctrl.y = y;
       ctrl.row = row;
       ctrl.column = col;
       $log.info(["Clicked on cell:", row, col]);
       if (!$scope.isYourTurn) {
         return;
       }
+      return {x:row, y:col};
+    };
+    function tryMakeMove(row, col){
       try {
         var move = gameLogic.createMove($scope.board, row, col,0,0,0, $scope.turnIndex);
         $scope.isYourTurn = false; // to prevent making another move
@@ -70,6 +107,7 @@ angular.module('myApp',
         $log.info(["Cell is already full in position:", row, col, e.message]);
         return;
       }
+      //hexagon.updateUI();
     };
 
     scaleBodyService.scaleBody({width: 1000, height: 1100});

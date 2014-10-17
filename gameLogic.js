@@ -138,7 +138,6 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
    * with index turnIndexBeforeMove makes a move in cell row X col. 
    */
   function createMove(board, row, col, delDirRow, delDirCol, delDis, turnIndexBeforeMove) {
-    console.log(row, col);
     if(board === undefined) board = setBoard();
     if (board[row][col] !== '') {
         throw new Error("One can only make a move in an empty position!");
@@ -222,6 +221,10 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
       if (!isEqual(move, expectedMove)) {
         return false;
       }
+      if(row<0 || row > 10) return false;
+      if(horIndex[row][0] > col || horIndex[row][1] <= col){
+        return false;
+      } 
     } catch (e) {
       // if there are any exceptions then the move is illegal
       return false;
@@ -325,7 +328,26 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
         // Checking an illegal move.
         isMoveOk({turnIndexBeforeMove: 0, stateBeforeMove: {}, move: [{setTurn: {turnIndex : 0}}]})
         ]);
-
+  /**
+  * Returns the move that the computer player should do for the given board.
+  * The computer will play in a random empty cell in the board.
+  */
+  this.createComputerMove = function(board, turnIndexBeforeMove) {
+      var possibleMoves = [];
+      var i, j;
+      for (i = 0; i < 11; i++) {
+        for (j = horIndex[i][0]; j < horIndex[i][1]; j++) {
+          try {
+            possibleMoves.push(createMove(board, i, j,0, 0,0, turnIndexBeforeMove));
+          } catch (e) {
+            // The cell in that position was full.
+          }
+        }
+      }
+      var randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+      console.log("random move is: ", randomMove[2].set.value.row, randomMove[2].set.value.col);
+      return randomMove;
+  }
     this.isMoveOk=isMoveOk;
     this.horIndex = horIndex;
     this.copyObject = copyObject;

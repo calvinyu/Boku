@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="myApp">
 <head>
+
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Boku</title>
   <meta name="description" content="Boku game">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="normalize.css">
+  <link href='http://fonts.googleapis.com/css?family=Special+Elite|Open+Sans:400italic,700italic,400,700,800|Changa+One' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="main.css">
   <script src="components/angular/angular.js"></script>
     <script src="hexagon.js"></script>
 
-  <script src="game.js"></script>
   <script src="gameLogic.js"></script>
+  <script src="game.js"></script>
   <script src="messageService.js"></script>  <script src="scaleBodyService.js"></script>
   <!-- for local testing purposes ! -->
   <script src="http://yoav-zibin.github.io/emulator/platform.js"></script>
@@ -19,7 +23,6 @@
   <div>
   <!-- Draw hexagon here -->
   <canvas id="HexCanvas" width="1000" height="1100" ng-click="cellClicked($event);"></canvas>
-  
 </div>
 </body>
 </html>
