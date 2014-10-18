@@ -52,8 +52,9 @@ angular.module('myApp',['ngTouch']).controller('Ctrl', function (
     updateUI({stateAfterMove: {}, turnIndexAfterMove: 0, yourPlayerIndex: -2});
     
     $scope.cellClicked = function (e) {
-      var position = getRowCol(e.pageX, e.pageY);
-      console.log(e.pageX, e.pageY);
+      e = e.changedTouches[0];
+      var position = getRowCol(e.clientX, e.clientY);
+      console.log("x,y",e);
       tryMakeMove(position.x, position.y);
     }
     function getRowCol(x,y) {
