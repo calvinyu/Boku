@@ -1,32 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp">
+<html manifest="game.appcache" lang="en" ng-app="myApp">
 <head>
-
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Boku</title>
   <meta name="description" content="Boku game">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="normalize.css">
-  <link href='http://fonts.googleapis.com/css?family=Special+Elite|Open+Sans:400italic,700italic,400,700,800|Changa+One' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="main.css">
-  <script src="components/angular/angular.js"></script>
-    <script src="hexagon.js"></script>
-
-  <script src="gameLogic.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular-touch.min.js"></script>
   <script src="game.js"></script>
-  <script src="messageService.js"></script>  <script src="scaleBodyService.js"></script>
-  <!-- for local testing purposes ! -->
-  <script src="http://yoav-zibin.github.io/emulator/platform.js"></script>
-  <script src="http://yoav-zibin.github.io/emulator/angular-dragdrop.1.0.8.min.js"></script>
+  <script src="hexagon.js"></script>
+  <script src="gameLogic.js"></script>
+  <script src="http://yoav-zibin.github.io/emulator/gameService.js"></script>
+  <script src="http://yoav-zibin.github.io/emulator/messageService.js"></script>
+  <script src="scaleBodyService.js"></script>
+  <script src="http://yoav-zibin.github.io/emulator/stateService.js"></script>
+  <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body ng-controller="Ctrl as ctrl">
   <div>
-
-  <!-- Draw hexagon here -->
-  <!--div ng-repeat="row in board track by $index">
-      <canvas ng-repeat="cell in row track by $index" id="HexCanvas{{$parent.$index}}-{{$index}}" width="1000" height="1100" ng-click="cellClicked($event);" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
-  </div-->
   <canvas id="HexCanvas" width="1000" height="1100" ng-click="cellClicked($event);"></canvas>
 </div>
 </body>

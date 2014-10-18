@@ -1,4 +1,5 @@
-angular.module('myApp.gameLogic', []).service('gameLogic', function(){
+
+angular.module('myApp').service('gameLogic', function(){
 /*
  * Grid representation:
  *
@@ -195,6 +196,7 @@ var tilIndex = [[0, 4], [0, 3], [0, 2], [0, 1], [0, 0], [1, 0],
         // Initially (at the beginning of the match), stateBeforeMove is {}. 
         board = setBoard();
       }
+
       // One can't place at a position that was taken at last move.
       if(delDis!==0 && delDisBeforeMove !== 0 && delDirRow === row && delDirCol === col) {
         return false;

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
+angular.module('myApp').service('hexagon', function($window) {
     // Hex math defined here: http://blog.ruslans.com/2011/02/hexagonal-grid-math.html
     var hex = this;
     this.HexagonGrid = function(canvasId, radius) {
@@ -144,7 +144,6 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
         mouseY -= hex.ty;
         mouseX -= hex.canvasOriginX;
         mouseY -= hex.canvasOriginY;
-
         var column = Math.floor((mouseX) / hex.side);
         var row = Math.floor(
             column % 2 == 0
@@ -230,6 +229,7 @@ angular.module('myApp.hexagon',[]).service('hexagon', function($window) {
         var tile = hex.getSelectedTile(mouseX, mouseY);
         hex.column = tile.column;
         hex.row = tile.row;
+
     };
     this.updateUI = function(){
         if (hex.column >= 0 && hex.row >= 0) {

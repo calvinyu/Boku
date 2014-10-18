@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.scaleBodyService', [])
+angular.module('myApp')
   .service('scaleBodyService', function($window, $log) {
     var doc = $window.document;
     var body = doc.body;
