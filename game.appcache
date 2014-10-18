@@ -8,6 +8,6 @@ scaleBodyService.js
 http://yoav-zibin.github.io/emulator/stateService.js
 game.js
 gameLogic.js
-hexajon.js
+hexagon.js
 main.css
 audio/small_gun.mp3
