@@ -52,6 +52,10 @@ angular.module('myApp',['ngTouch']).controller('Ctrl', function (
     updateUI({stateAfterMove: {}, turnIndexAfterMove: 0, yourPlayerIndex: -2});
     
     $scope.cellClicked = function (e) {
+      //if not my turn, do nothing
+      if (!$scope.isYourTurn) {
+        return;
+      }
       e = e.changedTouches[0];
       var position = getRowCol(e.clientX, e.clientY);
       console.log("x,y",e);
