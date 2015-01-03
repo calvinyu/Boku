@@ -45,8 +45,11 @@ angular.module('myApp').service('hexagon', function($window) {
                     debugText = currentHexY;
                 }
                 if(x>=0 && x<11){
-                    if((board[x][y] =='R' || board[x][y] =='Y' || board[x][y]=='' )&& row==hex.row && col==hex.column)
+                    if((board[x][y] =='R' || board[x][y] =='Y' || board[x][y]=='' )&& row==hex.row && col==hex.column){
                         animateMove(currentHexX, currentHexY, (new Date()).getTime(), board[x][y]);
+                        hex.row = -1;
+                        hex.column = -1;
+                    }
                         //hex.drawHex(currentHexX, currentHexY, "#888", debugText);
                     else if(board[x][y] == 'R')
                         hex.drawHex(currentHexX, currentHexY, "#f00", debugText);
