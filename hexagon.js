@@ -19,6 +19,7 @@ angular.module('myApp').service('hexagon', function($window) {
     };
 
     this.drawHexGrid = function (hor, originX, originY, isDebug, board) {
+        hex.context.clearRect(0,0,hex.canvas.width, hex.canvas.height);
         hex.canvasOriginX = originX;
         hex.canvasOriginY = originY;
         
